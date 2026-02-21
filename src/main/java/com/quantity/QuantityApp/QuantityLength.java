@@ -1,49 +1,54 @@
 package com.quantity.QuantityApp;
 
+import java.util.Objects;
+
 public class QuantityLength {
 
     private final double value;
     private final LengthUnit unit;
 
-    private static final double EPSILON = 0.0001;
-
     public QuantityLength(double value, LengthUnit unit) {
 
-        if (unit == null)
-            throw new IllegalArgumentException("Unit cannot be null");
+        if (Double.isNaN(value) || Double.isInfinite(value)) {
+            throw new IllegalArgumentException("Invalid numeric value");
+        }
 
-        if (value < 0)
-            throw new IllegalArgumentException("Value must be numeric");
+        if (unit == null) {
+            throw new IllegalArgumentException("Unit cannot be null");
+        }
 
         this.value = value;
         this.unit = unit;
     }
 
-    public double toFeet() {
-        return unit.toFeet(value);
+    public double getValue() {
+        return value;
+    }
+
+    public LengthUnit getUnit() {
+        return unit;
+    }
+
+    private double convertToBase() {
+        return unit.toBaseUnit(value);
     }
 
     @Override
     public boolean equals(Object obj) {
 
-        if (this == obj) return true;
-        if (obj == null || !(obj instanceof QuantityLength))
-            return false;
+        if (this == obj) return true;              // Reflexive
+        if (obj == null) return false;             // Null safety
+        if (getClass() != obj.getClass()) return false; // Type safety
 
         QuantityLength other = (QuantityLength) obj;
 
-        double diff = Math.abs(this.toFeet() - other.toFeet());
-        return diff < EPSILON;
+        return Double.compare(this.convertToBase(),
+                other.convertToBase()) == 0;
     }
 
     @Override
     public int hashCode() {
-        return Double.hashCode(toFeet());
-    }
-
-    @Override
-    public String toString() {
-        return value + " " + unit;
+        return Objects.hash(convertToBase());
     }
 }
 
