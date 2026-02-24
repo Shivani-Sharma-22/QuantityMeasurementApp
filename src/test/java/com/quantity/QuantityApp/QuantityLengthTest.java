@@ -70,6 +70,51 @@ class QuantityLengthTest {
         assertThrows(IllegalArgumentException.class,
                 () -> new QuantityLength(Double.NaN, LengthUnit.FEET));
     }
+    @Test
+    void testConvertTo_FeetToInch() {
+        QuantityLength q = new QuantityLength(1.0, LengthUnit.FEET);
+        QuantityLength converted = q.convertTo(LengthUnit.INCH);
+
+        assertEquals(12.0, converted.getValue());
+        assertEquals(LengthUnit.INCH, converted.getUnit());
+    }
+    @Test
+    void testConvertTo_InchToFeet() {
+        QuantityLength q = new QuantityLength(12.0, LengthUnit.INCH);
+        QuantityLength converted = q.convertTo(LengthUnit.FEET);
+
+        assertEquals(1.0, converted.getValue());
+        assertEquals(LengthUnit.FEET, converted.getUnit());
+    }
+    @Test
+    void testConvertTo_YardToFeet() {
+        QuantityLength q = new QuantityLength(2.0, LengthUnit.YARDS);
+        QuantityLength converted = q.convertTo(LengthUnit.FEET);
+
+        assertEquals(6.0, converted.getValue());
+        assertEquals(LengthUnit.FEET, converted.getUnit());
+    }
+    @Test
+    void testConvertTo_NegativeValue() {
+        QuantityLength q = new QuantityLength(-2.0, LengthUnit.YARDS);
+        QuantityLength converted = q.convertTo(LengthUnit.FEET);
+
+        assertEquals(-6.0, converted.getValue());
+    }
+    @Test
+    void testConvertTo_ZeroValue() {
+        QuantityLength q = new QuantityLength(0.0, LengthUnit.FEET);
+        QuantityLength converted = q.convertTo(LengthUnit.INCH);
+
+        assertEquals(0.0, converted.getValue());
+    }
+    @Test
+    void testConvertTo_NullTarget() {
+        QuantityLength q = new QuantityLength(1.0, LengthUnit.FEET);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> q.convertTo(null));
+    }
 }
 
 
