@@ -30,7 +30,7 @@ public class QuantityLength {
     }
 
     private double convertToBase() {
-        return unit.toBaseUnit(value);
+        return unit.toFeet(value);
     }
 
     @Override
@@ -44,6 +44,10 @@ public class QuantityLength {
 
         return Double.compare(this.convertToBase(),
                 other.convertToBase()) == 0;
+    }
+    @Override
+    public String toString() {
+        return "Quantity(" + value + ", " + unit + ")";
     }
 
     @Override

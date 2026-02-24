@@ -2,25 +2,25 @@ package com.quantity.QuantityApp;
 
 public class QuantityMeasurementApp {
 
-    public static boolean compare(
-            double v1, LengthUnit u1,
-            double v2, LengthUnit u2) {
-
-        QuantityLength q1 = new QuantityLength(v1, u1);
-        QuantityLength q2 = new QuantityLength(v2, u2);
-
-        return q1.equals(q2);
-    }
-
     public static void main(String[] args) {
 
-        System.out.println(
-                compare(1.0, LengthUnit.FEET,
-                        12.0, LengthUnit.INCH));
+    	 QuantityLength q1 =  new QuantityLength(1.0, LengthUnit.YARDS);
+         QuantityLength q2 =  new QuantityLength(3.0, LengthUnit.FEET);
 
-        System.out.println(
-                compare(1.0, LengthUnit.INCH,
-                        1.0, LengthUnit.INCH));
+         System.out.println("Input: " + q1 + " and " + q2);
+         System.out.println("Output: Equal (" + q1.equals(q2) + ")");
+
+         QuantityLength q3 =  new QuantityLength(1.0, LengthUnit.YARDS);
+         QuantityLength q4 =new QuantityLength(36.0, LengthUnit.INCH);
+
+         System.out.println("Input: " + q3 + " and " + q4);
+         System.out.println("Output: Equal (" + q3.equals(q4) + ")");
+
+         QuantityLength q5 =  new QuantityLength(1.0, LengthUnit.CENTIMETERS);
+         QuantityLength q6 =  new QuantityLength(0.393701, LengthUnit.INCH);
+
+         System.out.println("Input: " + q5 + " and " + q6);
+         System.out.println("Output: Equal (" + q5.equals(q6) + ")");
     }
 }
 
