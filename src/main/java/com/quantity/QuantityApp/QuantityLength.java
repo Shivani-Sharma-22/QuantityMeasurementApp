@@ -1,5 +1,7 @@
 package com.quantity.QuantityApp;
 
+
+
 import java.util.Objects;
 
 public class QuantityLength {
@@ -9,7 +11,6 @@ public class QuantityLength {
     private static final double EPSILON = 1e-6;
 
     public QuantityLength(double value, LengthUnit unit) {
-
         if (Double.isNaN(value) || Double.isInfinite(value)) {
             throw new IllegalArgumentException("Invalid numeric value");
         }
@@ -30,8 +31,6 @@ public class QuantityLength {
         return unit;
     }
 
-   
-    
     /**
      * Converts this QuantityLength to a target unit.
      * Returns a new immutable QuantityLength instance.
@@ -44,76 +43,81 @@ public class QuantityLength {
         double convertedValue = convert(this.value, this.unit, target);
         return new QuantityLength(convertedValue, target);
     }
-    
+
     /**
      * Static conversion API.
      * Converts a value from source unit to target unit.
      */
-    public static double convert(double value,
-            LengthUnit source,
-            LengthUnit target) {
-    	if(!Double.isFinite(value)) {
-    		throw new IllegalArgumentException("Invalid numeric value");
-    	}
-    	if(target == null || source == null) {
-    		throw new IllegalArgumentException("Unit cannot be null");
-    	}
-          return value * (source.getConversionFactor() /
-                  target.getConversionFactor());
+    public static double convert(double value, LengthUnit source, LengthUnit target) {
+        if (!Double.isFinite(value)) {
+            throw new IllegalArgumentException("Invalid numeric value");
+        }
+        if (source == null || target == null) {
+            throw new IllegalArgumentException("Unit cannot be null");
+        }
+        return value * (source.getConversionFactor() / target.getConversionFactor());
     }
-    /** 
-     * Quantity Length API to add two lengths
-     */
-    private static double fromBase(double baseValue,
-            LengthUnit target) {
-       return baseValue / target.getConversionFactor();
-}
-    public QuantityLength add(QuantityLength other) {
 
+    /**
+     * Converts base unit value to target unit.
+     */
+    private static double fromBase(double baseValue, LengthUnit target) {
+        return baseValue / target.getConversionFactor();
+    }
+
+    /**
+     * UC6: Add two QuantityLength objects (result in first operand's unit)
+     */
+    public QuantityLength add(QuantityLength other) {
+        return add(other, this.unit); // delegate to UC7 version
+    }
+
+    /**
+     * UC7: Add two QuantityLength objects with explicit target unit
+     */
+    public QuantityLength add(QuantityLength other, LengthUnit targetUnit) {
         if (other == null) {
             throw new IllegalArgumentException("Cannot add null quantity");
         }
+        if (targetUnit == null) {
+            throw new IllegalArgumentException("Target unit cannot be null");
+        }
 
-        double sumBase = this.convertToBase()
-                          + other.convertToBase();
+        // Convert both quantities to base unit (feet)
+        double sumBase = this.convertToBase() + other.convertToBase();
 
-        double result = fromBase(sumBase, this.unit);
+        // Convert sum to target unit
+        double result = fromBase(sumBase, targetUnit);
 
-        return new QuantityLength(result, this.unit);
+        return new QuantityLength(result, targetUnit);
     }
 
-    @Override
-    public boolean equals(Object obj) {
-
-        if (this == obj) return true;
-        if (!(obj instanceof QuantityLength other)) return false;
-
-        double baseThis = this.convertToBase();
-        double baseOther = other.convertToBase();
-
-        return Math.abs(baseThis - baseOther) < EPSILON;
-    }
     /**
-     * Converts current value to base unit (feet).
-     * Private helper for comparison.
+     * Converts current value to base unit (feet) for internal use
      */
     private double convertToBase() {
         return unit.toFeet(value);
     }
-    @Override
-    public String toString() {
-    	return value + " " + unit;
-    }
 
     /**
-     * If two objects are equal → they produce same hashCode.
+     * Equality check based on base unit (feet) with epsilon tolerance
      */
     @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof QuantityLength other)) return false;
+
+        return Math.abs(this.convertToBase() - other.convertToBase()) < EPSILON;
+    }
+
+    @Override
     public int hashCode() {
-    	long normalized = Math.round(convertToBase() / EPSILON);
+        long normalized = Math.round(convertToBase() / EPSILON);
         return Objects.hash(normalized);
     }
 
+    @Override
+    public String toString() {
+        return value + " " + unit;
+    }
 }
-
-
