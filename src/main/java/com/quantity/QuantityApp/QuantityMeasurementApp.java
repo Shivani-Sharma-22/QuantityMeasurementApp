@@ -1,5 +1,7 @@
 package com.quantity.QuantityApp;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class QuantityMeasurementApp {
 
     public static void main(String[] args) {
@@ -60,6 +62,23 @@ public class QuantityMeasurementApp {
          QuantityLength zeroLength = new QuantityLength(0.0, LengthUnit.FEET);
          System.out.println(zeroLength + " → " +
                  zeroLength.convertTo(LengthUnit.INCH));
+         System.out.println("\n======== QUANTITY LENGTH API TO ADD TO LENGTH(UC6) ========");
+         
+         QuantityLength length1 = new QuantityLength(1.0,LengthUnit.FEET);
+         QuantityLength length2 = new QuantityLength(12.0,LengthUnit.INCH);
+         
+         System.out.println(length1.add(length2));
+         System.out.println(length2.add(length1));
+         
+         QuantityLength a = new QuantityLength(5.0, LengthUnit.FEET);
+         QuantityLength b = new QuantityLength(-2.0, LengthUnit.FEET);
+
+         System.out.println(a.add(b));
+         System.out.println(b.add(a));
+         System.out.println(a.add(a));
+         
+         
+     	
     }
 }
 

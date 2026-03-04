@@ -61,19 +61,37 @@ public class QuantityLength {
           return value * (source.getConversionFactor() /
                   target.getConversionFactor());
     }
-    
+    /** 
+     * Quantity Length API to add two lengths
+     */
+    private static double fromBase(double baseValue,
+            LengthUnit target) {
+       return baseValue / target.getConversionFactor();
+}
+    public QuantityLength add(QuantityLength other) {
+
+        if (other == null) {
+            throw new IllegalArgumentException("Cannot add null quantity");
+        }
+
+        double sumBase = this.convertToBase()
+                          + other.convertToBase();
+
+        double result = fromBase(sumBase, this.unit);
+
+        return new QuantityLength(result, this.unit);
+    }
 
     @Override
     public boolean equals(Object obj) {
 
-        if (this == obj) return true;              // Reflexive
-        if (obj == null) return false;             // Null safety
-        if (getClass() != obj.getClass()) return false; // Type safety
+        if (this == obj) return true;
+        if (!(obj instanceof QuantityLength other)) return false;
 
-        QuantityLength other = (QuantityLength) obj;
+        double baseThis = this.convertToBase();
+        double baseOther = other.convertToBase();
 
-        return Math.abs(this.convertToBase()-
-                other.convertToBase()) < EPSILON;
+        return Math.abs(baseThis - baseOther) < EPSILON;
     }
     /**
      * Converts current value to base unit (feet).
@@ -84,7 +102,7 @@ public class QuantityLength {
     }
     @Override
     public String toString() {
-        return "(" + value + ", " + unit + ")";
+    	return value + " " + unit;
     }
 
     /**
