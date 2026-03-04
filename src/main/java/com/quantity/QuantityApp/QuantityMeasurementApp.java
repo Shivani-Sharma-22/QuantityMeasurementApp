@@ -1,22 +1,18 @@
 package com.quantity.QuantityApp;
 
+
+
 public class QuantityMeasurementApp {
 
     public static void main(String[] args) {
-        System.out.println("\n============Quantiy Length Api to add to target length=========");
-        QuantityLength l1 = new QuantityLength(1.0, LengthUnit.FEET);
-        QuantityLength l2 = new QuantityLength(12.0, LengthUnit.INCH);
+    	 QuantityLength q1 = new QuantityLength(1.0, LengthUnit.FEET);
+         QuantityLength q2 = new QuantityLength(12.0, LengthUnit.INCH);
 
-        // UC6 style
-        System.out.println("UC6-style");
-        System.out.println(l1.add(l2)); 
-       
-
-        // UC7 style
-        System.out.println(l1.add(l2, LengthUnit.INCH)); 
-       
-
-        System.out.println(l1.add(l2, LengthUnit.YARDS));
+         System.out.println(q1.convertTo(LengthUnit.INCH));
+         System.out.println(q1.add(q2, LengthUnit.FEET));
+         System.out.println(new QuantityLength(36.0, LengthUnit.INCH)
+                 .equals(new QuantityLength(1.0, LengthUnit.YARDS)));  
+     	
     }
 }
 

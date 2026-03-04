@@ -1,7 +1,5 @@
 package com.quantity.QuantityApp;
 
-
-
 import java.util.Objects;
 
 public class QuantityLength {
@@ -35,35 +33,17 @@ public class QuantityLength {
      * Converts this QuantityLength to a target unit.
      * Returns a new immutable QuantityLength instance.
      */
+    //  UC5 Conversion (delegated to LengthUnit)
     public QuantityLength convertTo(LengthUnit target) {
         if (target == null) {
             throw new IllegalArgumentException("Unit cannot be null");
         }
 
-        double convertedValue = convert(this.value, this.unit, target);
-        return new QuantityLength(convertedValue, target);
+        double base = unit.convertToBaseUnit(value);
+        double converted = target.convertFromBaseUnit(base);
+        return new QuantityLength(converted, target);
     }
 
-    /**
-     * Static conversion API.
-     * Converts a value from source unit to target unit.
-     */
-    public static double convert(double value, LengthUnit source, LengthUnit target) {
-        if (!Double.isFinite(value)) {
-            throw new IllegalArgumentException("Invalid numeric value");
-        }
-        if (source == null || target == null) {
-            throw new IllegalArgumentException("Unit cannot be null");
-        }
-        return value * (source.getConversionFactor() / target.getConversionFactor());
-    }
-
-    /**
-     * Converts base unit value to target unit.
-     */
-    private static double fromBase(double baseValue, LengthUnit target) {
-        return baseValue / target.getConversionFactor();
-    }
 
     /**
      * UC6: Add two QuantityLength objects (result in first operand's unit)
@@ -83,36 +63,28 @@ public class QuantityLength {
             throw new IllegalArgumentException("Target unit cannot be null");
         }
 
-        // Convert both quantities to base unit (feet)
-        double sumBase = this.convertToBase() + other.convertToBase();
+        double sumBase = unit.convertToBaseUnit(this.value) + other.unit.convertToBaseUnit(other.value);
+        double finalValue = targetUnit.convertFromBaseUnit(sumBase);
 
-        // Convert sum to target unit
-        double result = fromBase(sumBase, targetUnit);
-
-        return new QuantityLength(result, targetUnit);
+        return new QuantityLength(finalValue, targetUnit);
     }
 
-    /**
-     * Converts current value to base unit (feet) for internal use
-     */
-    private double convertToBase() {
-        return unit.toFeet(value);
-    }
+   
 
-    /**
-     * Equality check based on base unit (feet) with epsilon tolerance
-     */
+  // Equality using base unit
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof QuantityLength other)) return false;
 
-        return Math.abs(this.convertToBase() - other.convertToBase()) < EPSILON;
+        double baseThis = unit.convertToBaseUnit(value);
+        double baseOther = other.unit.convertToBaseUnit(other.value);
+        return Math.abs(baseThis - baseOther) < EPSILON;
     }
 
     @Override
     public int hashCode() {
-        long normalized = Math.round(convertToBase() / EPSILON);
+    	long normalized = Math.round(unit.convertToBaseUnit(value) / EPSILON);
         return Objects.hash(normalized);
     }
 
