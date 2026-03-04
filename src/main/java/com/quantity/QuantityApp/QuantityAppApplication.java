@@ -8,8 +8,6 @@ public class QuantityAppApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(QuantityAppApplication.class, args);
-		// Add your test code here
-        QuantityMeasurementApp.main(args);
 	}
 
 }
