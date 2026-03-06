@@ -23,23 +23,33 @@ public class QuantityMeasurementApp {
     }
     public static void main(String[] args) {
 
-        System.out.println("===== LENGTH OPERATIONS =====");
+        
+        System.out.println("\n===== VOLUME OPERATIONS =====");
+        Quantity<VolumeUnit> v1 = new Quantity<>(1.0,VolumeUnit.LITRE);
+        Quantity<VolumeUnit> v2 = new Quantity<>(1000.0,VolumeUnit.MILLILITRE);
+        demonstrateEquality(v1, v2);
+        
+        Quantity<VolumeUnit> v3 = new Quantity<>(1.0,VolumeUnit.LITRE);
+        Quantity<VolumeUnit> v4 = new Quantity<>(1.0,VolumeUnit.LITRE);
+        demonstrateEquality(v3, v4);
+        
+        Quantity<VolumeUnit> v5 = new Quantity<>(1.0,VolumeUnit.LITRE);
+        Quantity<VolumeUnit> v6 = new Quantity<>(2.0,VolumeUnit.LITRE);
+        demonstrateEquality(v1, v2);
+        demonstrateConversion(v1, VolumeUnit.MILLILITRE);
+        demonstrateAddition(v5, v6, VolumeUnit.LITRE);
+        
+        System.out.println("\n===== TARGET UNIT ADDITION CHECK =====");
 
-        Quantity<LengthUnit> l1 = new Quantity<>(1.0, LengthUnit.FEET);
-        Quantity<LengthUnit> l2 = new Quantity<>(12.0, LengthUnit.INCH);
+        Quantity<VolumeUnit> v7 = new Quantity<>(1.0, VolumeUnit.LITRE);
+        Quantity<VolumeUnit> v8 = new Quantity<>(1000.0, VolumeUnit.MILLILITRE);
 
-        demonstrateEquality(l1, l2);
-        demonstrateConversion(l1, LengthUnit.INCH);
-        demonstrateAddition(l1, l2, LengthUnit.FEET);
+        // Target unit = MILLILITRE
+        Quantity<VolumeUnit> result = v7.add(v8, VolumeUnit.MILLILITRE);
 
-        System.out.println("\n===== WEIGHT OPERATIONS =====");
-
-        Quantity<WeightUnit> w1 = new Quantity<>(1.0, WeightUnit.KILOGRAM);
-        Quantity<WeightUnit> w2 = new Quantity<>(1000.0, WeightUnit.GRAM);
-
-        demonstrateEquality(w1, w2);
-        demonstrateConversion(w1, WeightUnit.GRAM);
-        demonstrateAddition(w1, w2, WeightUnit.KILOGRAM);
+        System.out.println(v7 + " + " + v8 + " in MILLILITRE → " + result);
+        
+        
     }
 }
 
