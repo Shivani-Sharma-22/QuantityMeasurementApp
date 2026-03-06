@@ -1,6 +1,7 @@
 package com.quantity.QuantityApp;
 
 public interface IMeasurable {
+	
 	double getConversionFactor();  
 
     default double convertToBaseUnit(double value) {

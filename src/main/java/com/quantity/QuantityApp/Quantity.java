@@ -61,8 +61,52 @@ public final class Quantity<U extends IMeasurable> {
 
         return new Quantity<>(finalValue, targetUnit);
     }
+    
+    public Quantity<U> subtract(Quantity<U> other){
+    	return subtract(other,this.unit);
+    }
 
-    @Override
+    public Quantity<U> subtract(Quantity<U> other, U targetUnit) {
+    	if (other == null)
+            throw new IllegalArgumentException("Other quantity cannot be null");
+
+        if (targetUnit == null)
+            throw new IllegalArgumentException("Target unit cannot be null");
+        
+        double subBase = this.toBaseUnit() - other.toBaseUnit();
+        double finalAns = targetUnit.convertFromBaseUnit(subBase);
+        
+        return new Quantity<>(finalAns,targetUnit);
+		
+	}
+   
+    public Quantity<U> divide(Quantity<U> other) {
+        return divide(other, this.unit); // default target is this.unit
+    }
+
+    public Quantity<U> divide(Quantity<U> other, U targetUnit) {
+        if (other == null)
+            throw new IllegalArgumentException("Other quantity cannot be null");
+
+        if (targetUnit == null)
+            throw new IllegalArgumentException("Target unit cannot be null");
+
+        // CROSS-CATEGORY CHECK
+        if (!this.unit.getClass().equals(other.unit.getClass()))
+            throw new IllegalArgumentException("Cannot operate on different measurement categories");
+
+        double divisor = other.toBaseUnit();
+
+        if (Math.abs(divisor) < EPSILON)
+            throw new ArithmeticException("Division by zero");
+
+        double resultBase = this.toBaseUnit() / divisor;
+        double finalValue = targetUnit.convertFromBaseUnit(resultBase);
+
+        return new Quantity<>(finalValue, targetUnit);
+    }
+
+	@Override
     public boolean equals(Object obj) {
 
         if (this == obj) return true;
