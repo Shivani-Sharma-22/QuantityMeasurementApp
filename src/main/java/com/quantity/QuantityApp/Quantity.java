@@ -2,120 +2,198 @@ package com.quantity.QuantityApp;
 
 import java.util.Objects;
 
+
+
 public final class Quantity<U extends IMeasurable> {
+	private static final double EPSILON = 1e-4;
+	private final double value;
+	private final U unit;
 
-    private final double value;
-    private final U unit;
-    private static final double EPSILON = 1e-6;
+	public Quantity(double value, U unit) {
+		if (unit == null) {
+			throw new IllegalArgumentException("Unit cannot be null");
+		}
 
-    public Quantity(double value, U unit) {
-        if (!Double.isFinite(value))
-            throw new IllegalArgumentException("Value must be finite");
-        if (unit == null)
-            throw new IllegalArgumentException("Unit cannot be null");
+		if (!Double.isFinite(value)) {
+			throw new IllegalArgumentException("Value must be finite");
+		}
 
-        this.value = value;
-        this.unit = unit;
-    }
+		this.value = value;
+		this.unit = unit;
+	}
 
-    public double getValue() {
-        return value;
-    }
+	public double getValue() {
+		return value;
+	}
 
-    public U getUnit() {
-        return unit;
-    }
+	public U getUnit() {
+		return unit;
+	}
 
-    // Convert to base unit (internal)
-    private double toBaseUnit() {
-        return unit.convertToBaseUnit(value);
-    }
+	private double toBaseUnit() {
+		return unit.convertToBaseUnit(value);
+	}
 
-    // General conversion
-    public Quantity<U> convertTo(U targetUnit) {
-        if (targetUnit == null)
-            throw new IllegalArgumentException("Target unit cannot be null");
-        double base = toBaseUnit();
-        double converted = targetUnit.convertFromBaseUnit(base);
-        return new Quantity<>(converted, targetUnit);
-    }
+	// UC13 --- enum for arithmetic operation
+	private enum ArithmeticOperation {
+		ADD {
+			@Override
+			double compute(double a, double b) {
+				return a + b;
+			}
+		},
 
-    // Helper for validation
-    private void validateArithmeticOperands(Quantity<U> other, U targetUnit, boolean targetRequired) {
-        if (other == null)
-            throw new IllegalArgumentException("Other quantity cannot be null");
-        if (targetRequired && targetUnit == null)
-            throw new IllegalArgumentException("Target unit cannot be null");
-        if (!this.unit.getClass().equals(other.unit.getClass()))
-            throw new IllegalArgumentException("Cannot operate on different measurement categories");
-    }
+		SUBTRACT {
+			@Override
+			double compute(double a, double b) {
+				return a - b;
+			}
+		},
 
-    // Helper to perform arithmetic
-    private double performBaseArithmetic(Quantity<U> other, ArithmeticOperation operation) {
-        double thisBase = this.toBaseUnit();
-        double otherBase = other.toBaseUnit();
-        return operation.compute(thisBase, otherBase);
-    }
+		DIVIDE {
+			@Override
+			double compute(double a, double b) {
+				if (b == 0.0) {
+					throw new ArithmeticException("Division by zero not allowed");
+				}
+				return a / b;
+			}
+		};
 
-    // --- Arithmetic Methods ---
+		abstract double compute(double a, double b);
+	}
 
-    public Quantity<U> add(Quantity<U> other) {
-        this.unit.validateOperationSupport("add");
-        other.unit.validateOperationSupport("add");
-        return add(other, this.unit);
-    }
+	// UC13 - validation
+	private void validateArithmeticOperands(Quantity<U> other, U targetUnit, boolean targetUnitRequired) {
 
-    public Quantity<U> add(Quantity<U> other, U targetUnit) {
-        validateArithmeticOperands(other, targetUnit, true);
-        double resultBase = performBaseArithmetic(other, ArithmeticOperation.ADD);
-        double finalValue = targetUnit.convertFromBaseUnit(resultBase);
-        return new Quantity<>(finalValue, targetUnit);
-    }
+		if (other == null) {
+			throw new IllegalArgumentException("Other quantity cannot be null");
+		}
 
-    public Quantity<U> subtract(Quantity<U> other) {
-        this.unit.validateOperationSupport("subtract");
-        other.unit.validateOperationSupport("subtract");
-        return subtract(other, this.unit);
-    }
+		if (!this.unit.getClass().equals(other.unit.getClass())) {
+			throw new IllegalArgumentException("Cross-category operation not allowed");
+		}
 
-    public Quantity<U> subtract(Quantity<U> other, U targetUnit) {
-        validateArithmeticOperands(other, targetUnit, true);
-        double resultBase = performBaseArithmetic(other, ArithmeticOperation.SUBTRACT);
-        double finalValue = targetUnit.convertFromBaseUnit(resultBase);
-        return new Quantity<>(finalValue, targetUnit);
-    }
+		if (!Double.isFinite(this.value) || !Double.isFinite(other.value)) {
+			throw new IllegalArgumentException("Values must be finite numbers");
+		}
 
-    public double divide(Quantity<U> other) {
-        this.unit.validateOperationSupport("divide");
-        other.unit.validateOperationSupport("divide");
-        validateArithmeticOperands(other, null, false);
-        return performBaseArithmetic(other, ArithmeticOperation.DIVIDE);
-    }
+		if (targetUnitRequired && targetUnit == null) {
+			throw new IllegalArgumentException("Target unit cannot be null");
+		}
 
-    // --- Equality & Hash ---
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (!(obj instanceof Quantity<?> other)) return false;
+		// UC14 to new validation
+		this.unit.validateOperationSupport("arithmetic");
+		other.unit.validateOperationSupport("arithmetic");
+	}
 
-        // Compare enum types (TemperatureUnit, LengthUnit, etc.)
-        if (!this.unit.getClass().getSuperclass().equals(other.unit.getClass().getSuperclass())
-            && !this.unit.getClass().equals(other.unit.getClass())) {
-            return false;
-        }
+	// it is base arithmetic engine
+	private double performBaseArithmetic(Quantity<U> other, ArithmeticOperation operation) {
 
-        // Compare values in base units (Celsius for temperature)
-        return Math.abs(this.toBaseUnit() - other.toBaseUnit()) < EPSILON;
-    }
+		double thisBase = this.unit.convertToBaseUnit(this.value);
+		double otherBase = other.unit.convertToBaseUnit(other.value);
 
-    @Override
-    public int hashCode() {
-        long normalized = Math.round(toBaseUnit() / EPSILON);
-        return Objects.hash(normalized, unit.getClass());
-    }
+		return operation.compute(thisBase, otherBase);
+	}
 
-    @Override
-    public String toString() {
-        return "Quantity(" + value + ", " + unit.getUnitName() + ")";
-    }
+	// conversion
+	public Quantity<U> convertTo(U targetUnit) {
+		Objects.requireNonNull(targetUnit, "Target unit cannot be null");
+
+		double baseValue = toBaseUnit();
+		double converted = targetUnit.convertFromBaseUnit(baseValue);
+
+		return new Quantity<>(round(converted), targetUnit);
+	}
+
+	// addition
+	public Quantity<U> add(Quantity<U> other) {
+		return add(other, this.unit);
+	}
+
+	public Quantity<U> add(Quantity<U> other, U targetUnit) {
+		validateArithmeticOperands(other, targetUnit, true);
+
+		double sumBase = performBaseArithmetic(other, ArithmeticOperation.ADD);
+		double finalValue = targetUnit.convertFromBaseUnit(sumBase);
+
+		return new Quantity<>(round(finalValue), targetUnit);
+	}
+
+	// UC12 ---
+	// subtraction
+	public Quantity<U> subtract(Quantity<U> other) {
+		return subtract(other, this.unit);
+	}
+
+	// it subtracts another quantity from this quantity and ans will be returned in
+	// target unit
+	public Quantity<U> subtract(Quantity<U> other, U targetUnit) {
+//        if (other == null) {
+//        	throw new IllegalArgumentException("Other quantity cannot be null");
+//        }
+//
+//        if (targetUnit == null) {
+//        	throw new IllegalArgumentException("Target unit cannot be null");
+//        }
+//
+//        if (!Double.isFinite(this.value) || !Double.isFinite(other.value)) {
+//        	throw new IllegalArgumentException("Values must be finite numbers");
+//        }
+//
+//        if (!this.unit.getClass().equals(other.unit.getClass())) {
+//        	throw new IllegalArgumentException("Cross-category subtraction not allowed");
+//        }
+		validateArithmeticOperands(other, targetUnit, true);
+
+		double baseResult = performBaseArithmetic(other, ArithmeticOperation.SUBTRACT);
+		double converted = targetUnit.convertFromBaseUnit(baseResult);
+
+		return new Quantity<>(round(converted), targetUnit);
+	}
+
+	// it divides this quantity by another quantity to return a dimensionless ans
+	public double divide(Quantity<U> other) {
+		validateArithmeticOperands(other, null, false);
+
+		return performBaseArithmetic(other, ArithmeticOperation.DIVIDE);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
+
+		Quantity<?> other = (Quantity<?>) obj;
+
+		// prevent cross-category comparison
+		if (!this.unit.getClass().equals(other.unit.getClass())) {
+			return false;
+		}
+
+		double thisBase = this.unit.convertToBaseUnit(this.value);
+		double otherBase = other.unit.convertToBaseUnit(other.value);
+
+		return Math.abs(thisBase - otherBase) < EPSILON;
+	}
+
+	@Override
+	public int hashCode() {
+		double baseValue = unit.convertToBaseUnit(value);
+		long rounded = Math.round(baseValue / EPSILON);
+		return Long.hashCode(rounded);
+	}
+
+	@Override
+	public String toString() {
+		return "Quantity(" + value + ", " + unit.getUnitName() + ")";
+	}
+
+	private static double round(double value) {
+		return Math.round(value * 100.0) / 100.0;
+	}
 }
