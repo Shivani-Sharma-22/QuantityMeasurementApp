@@ -1,7 +1,5 @@
 package com.quantity.QuantityApp.units;
 
-import com.quantity.QuantityApp.IMeasurable;
-
 //enum representing weight units.
 //base unit is GRAM
 

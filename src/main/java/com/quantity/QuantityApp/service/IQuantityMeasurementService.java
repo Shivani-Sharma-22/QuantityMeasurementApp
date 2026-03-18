@@ -1,6 +1,6 @@
 package com.quantity.QuantityApp.service;
 
-import com.quantity.QuantityApp.QuantityDTO.QuantityDTO;
+import com.quantity.QuantityApp.DTO.QuantityDTO;
 
 public interface IQuantityMeasurementService {
 	QuantityDTO convert(QuantityDTO input, String targetUnit);

@@ -1,7 +1,5 @@
 package com.quantity.QuantityApp.units;
 
-import com.quantity.QuantityApp.IMeasurable;
-
 //UC11 --- Volume measurement units
 //base unit is LITRE
 public enum VolumeUnit implements IMeasurable {

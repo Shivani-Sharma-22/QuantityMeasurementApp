@@ -1,7 +1,5 @@
 package com.quantity.QuantityApp.units;
 
-import com.quantity.QuantityApp.IMeasurable;
-
 public enum TemperatureUnit implements IMeasurable {
 	CELSIUS, 
 	FAHRENHEIT, 

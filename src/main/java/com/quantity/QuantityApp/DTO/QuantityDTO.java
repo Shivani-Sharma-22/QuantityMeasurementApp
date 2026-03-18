@@ -1,4 +1,4 @@
-package com.quantity.QuantityApp.QuantityDTO;
+package com.quantity.QuantityApp.DTO;
 
 public class QuantityDTO {
 	private double value;

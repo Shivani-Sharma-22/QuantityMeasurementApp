@@ -1,6 +1,8 @@
-package com.quantity.QuantityApp;
+package com.quantity.QuantityApp.Core;
 
 import java.util.Objects;
+
+import com.quantity.QuantityApp.units.IMeasurable;
 
 
 

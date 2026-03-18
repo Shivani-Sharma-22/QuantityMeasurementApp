@@ -1,7 +1,5 @@
 package com.quantity.QuantityApp.units;
 
-import com.quantity.QuantityApp.IMeasurable;
-
 public enum LengthUnit implements IMeasurable {
 	INCHES(1.0), // Base unit
 	FEET(12.0), // 1 foot = 12 inches

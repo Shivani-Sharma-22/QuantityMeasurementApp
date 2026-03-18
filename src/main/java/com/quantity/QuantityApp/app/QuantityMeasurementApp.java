@@ -1,10 +1,12 @@
-package com.quantity.QuantityApp;
+package com.quantity.QuantityApp.app;
 
-import com.quantity.QuantityApp.QuantityDTO.QuantityDTO;
+import com.quantity.QuantityApp.Core.Quantity;
+import com.quantity.QuantityApp.DTO.QuantityDTO;
 import com.quantity.QuantityApp.controller.QuantityMeasurementController;
 import com.quantity.QuantityApp.repository.QuantityMeasurementCacheRepository;
 import com.quantity.QuantityApp.service.IQuantityMeasurementService;
 import com.quantity.QuantityApp.service.QuantityMeasurementServiceImpl;
+import com.quantity.QuantityApp.units.IMeasurable;
 import com.quantity.QuantityApp.units.LengthUnit;
 import com.quantity.QuantityApp.units.TemperatureUnit;
 import com.quantity.QuantityApp.units.VolumeUnit;
@@ -161,9 +163,10 @@ public class QuantityMeasurementApp {
 	    demonstrateTemperature();
 	    
 		// UC15---
-		QuantityDTO q1 = new QuantityDTO(5, "FEET", "LENGTH");
-		QuantityDTO q2 = new QuantityDTO(60, "INCH", "LENGTH");
-		controller.performComparison(q1, q2);
+		QuantityDTO q1 = new QuantityDTO(5, "FEET", "LengthUnit");
+		QuantityDTO q2 = new QuantityDTO(60, "INCHES", "LengthUnit");
+		System.out.println("Controller Comparison Result: " 
+		        + controller.performComparison(q1, q2));
 		
 	}
 }
