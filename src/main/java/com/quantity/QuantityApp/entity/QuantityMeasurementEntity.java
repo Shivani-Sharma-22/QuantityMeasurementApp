@@ -1,58 +1,69 @@
 package com.quantity.QuantityApp.entity;
 
-import java.io.Serializable;
 
-public class QuantityMeasurementEntity implements Serializable{
-	private static final long serialVersionUID = 1L;
-	private String operation;
-	private String operand1;
-	private String operand2;
-	private String result;
-	private String error;
+import jakarta.persistence.*;
+import lombok.*;
 
-	public QuantityMeasurementEntity(String operation, String operand1, String operand2, String result) {
-		this.operation = operation;
-		this.operand1 = operand1;
-		this.operand2 = operand2;
-		this.result = result;
-	}
-	
-	public boolean hasError() {
-        return error != null;
+
+
+@Entity
+@Table(name = "quantity_measurements")
+
+public class QuantityMeasurementEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name="quantity_value", nullable=false)
+    private double quantityValue;
+
+    @Column(name="unit", nullable=false)
+    private String unit;
+
+    @Column(name="measurement_type", nullable=false)
+    private String measurementType;
+
+    public QuantityMeasurementEntity() {
     }
 
-	public QuantityMeasurementEntity(String operation, String error) {
-		this.operation = operation;
-		this.error = error;
-	}
+    public QuantityMeasurementEntity(double value, String unit, String measurementType) {
+        this.quantityValue = value;
+        this.unit = unit;
+        this.measurementType = measurementType;
+    }
 
-	public String getOperation() {
-		return operation;
-	}
+    public double getQuantityValue() {
+        return quantityValue;
+    }
 
-	public String getOperand1() {
-		return operand1;
-	}
+    public void setQuantityValue(double value) {
+        this.quantityValue = value;
+    }
 
-	public String getOperand2() {
-		return operand2;
-	}
+    public String getUnit() {
+        return unit;
+    }
 
-	public String getResult() {
-		return result;
-	}
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
 
-	public String getError() {
-		return error;
-	}
-	
-	@Override
-	public String toString() {
-		if (hasError()) {
-			return "Operation: " + operation + " | ERROR: " + error;
-		}
-		return "Operation: " + operation + " | Operand1: " + operand1 + " | Operand2: " + operand2 + " | Result: "
-				+ result;
-	}
+    public String getMeasurementType() {
+        return measurementType;
+    }
+
+    public void setMeasurementType(String measurementType) {
+        this.measurementType = measurementType;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%.2f %s", quantityValue, unit);
+    }
 
 }

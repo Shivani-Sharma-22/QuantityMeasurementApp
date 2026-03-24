@@ -1,174 +1,87 @@
 package com.quantity.QuantityApp.service;
 
-import com.quantity.QuantityApp.DTO.QuantityDTO;
-import com.quantity.QuantityApp.entity.QuantityMeasurementEntity;
-import com.quantity.QuantityApp.exception.QuantityMeasurementException;
-import com.quantity.QuantityApp.repository.IQuantityMeasurementRepository;
-import com.quantity.QuantityApp.repository.QuantityMeasurementCacheRepository;
-
 import com.quantity.QuantityApp.Core.Quantity;
-import com.quantity.QuantityApp.units.*;
+import com.quantity.QuantityApp.entity.OperationHistoryEntity;
+import com.quantity.QuantityApp.entity.QuantityMeasurementEntity;
+import com.quantity.QuantityApp.repository.OperationHistoryRepository;
+import com.quantity.QuantityApp.repository.QuantityMeasurementRepository;
+import com.quantity.QuantityApp.units.IMeasurable;
+import org.springframework.stereotype.Service;
 
-public class QuantityMeasurementServiceImpl implements IQuantityMeasurementService {
 
-    private final IQuantityMeasurementRepository repository;
-    
+@Service
+public class QuantityMeasurementServiceImpl implements QuantityService{
+    private final QuantityMeasurementRepository repo;
 
-    public QuantityMeasurementServiceImpl() {
-    	this.repository = QuantityMeasurementCacheRepository.getInstance();
+    private final OperationHistoryRepository historyRepo;
+
+
+    public QuantityMeasurementServiceImpl(QuantityMeasurementRepository repo, OperationHistoryRepository historyRepo) {
+        this.repo = repo;
+        this.historyRepo = historyRepo;
     }
 
-    public QuantityMeasurementServiceImpl(IQuantityMeasurementRepository repository) {
-        this.repository = repository;
+    private void save(Quantity<?> q) {
+        repo.save(new QuantityMeasurementEntity(
+                q.getValue(),
+                q.getUnit().getUnitName(),
+                q.getUnit().getClass().getSimpleName()
+        ));
+    }
+    private void saveHistory(String op, Quantity<?> q1, Quantity<?> q2, Object result) {
+
+        OperationHistoryEntity history = new OperationHistoryEntity(
+                op,
+                q1.toString(),
+                q2 != null ? q2.toString() : null,
+                result.toString()
+        );
+
+        historyRepo.save(history);
     }
 
-    private void validateType(QuantityDTO q1, QuantityDTO q2) {
-        if (!q1.getMeasurementType().equalsIgnoreCase(q2.getMeasurementType())) {
-            throw new QuantityMeasurementException("Measurement types must match");
-        }
-    }
-
-    private String format(QuantityDTO q) {
-        return q.getValue() + " " + q.getUnit();
-    }
-    //getUnits
-    private IMeasurable getUnit(String type, String unit) {
-
-        switch (type.toLowerCase()) {
-
-            case "lengthunit":
-                return LengthUnit.valueOf(unit.toUpperCase());
-
-            case "weightunit":
-                return WeightUnit.valueOf(unit.toUpperCase());
-
-            case "volumeunit":
-                return VolumeUnit.valueOf(unit.toUpperCase());
-
-            case "temperatureunit":
-                return TemperatureUnit.valueOf(unit.toUpperCase());
-
-            default:
-                throw new QuantityMeasurementException("Unsupported Measurement Type");
-        }
-    }
-    private QuantityDTO toDTO(Quantity<?> q, String type) {
-        return new QuantityDTO(q.getValue(), q.getUnit().getUnitName(), type);
-    }
-    
-    private Quantity<IMeasurable> DTOToQuantity(QuantityDTO quantityDto){
-    	IMeasurable u = getUnit(quantityDto.getMeasurementType(),quantityDto.getUnit());
-    	Quantity<IMeasurable> quantity = new Quantity<>(quantityDto.getValue(),u);
-    	
-    	return quantity;
-    }
-   
-
-    // ---------------- CONVERT ----------------
     @Override
-    public QuantityDTO convert(QuantityDTO input, String targetUnit) {
-
-        try {
-            IMeasurable from = getUnit(input.getMeasurementType(), input.getUnit());
-            IMeasurable to = getUnit(input.getMeasurementType(), targetUnit);
-
-            Quantity<IMeasurable> q = new Quantity<>(input.getValue(), from);
-            Quantity<IMeasurable> converted = q.convertTo(to);
-
-            QuantityDTO result = toDTO(converted, input.getMeasurementType());
-
-            repository.save(new QuantityMeasurementEntity(
-                    "CONVERT", format(input), null, format(result)
-            ));
-
-            return result;
-
-        } catch (Exception e) {
-            repository.save(new QuantityMeasurementEntity("CONVERT", e.getMessage()));
-            throw new QuantityMeasurementException("Conversion failed", e);
-        }
+    public Quantity<?> add(Quantity<?> q1, Quantity<?> q2) throws Exception {
+        Quantity<?> result = q1.add(q2);
+        save(q1);
+        save(q2);
+        saveHistory("ADD", q1, q2, result);
+        return result;
     }
 
-    // ---------------- ADD ----------------
     @Override
-    public QuantityDTO add(QuantityDTO q1, QuantityDTO q2) {
-        try {
-            validateType(q1, q2);
-
-            Quantity<IMeasurable> quantity1 = DTOToQuantity(q1);
-            Quantity<IMeasurable> quantity2 = DTOToQuantity(q2);
-            
-            QuantityDTO result = toDTO(quantity1.add(quantity2),q1.getMeasurementType());
-
-            repository.save(new QuantityMeasurementEntity(
-                    "ADD", format(q1), format(q2), format(result)
-            ));
-
-            return result;
-
-        } catch (Exception e) {
-            repository.save(new QuantityMeasurementEntity("ADD", e.getMessage()));
-            throw new QuantityMeasurementException("Addition failed", e);
-        }
+    public Quantity<?> subtract(Quantity<?> q1, Quantity<?> q2) throws Exception {
+        Quantity<?> result = q1.subtract(q2);
+        save(q1);
+        save(q2);
+        saveHistory("SUBTRACT",q1,q2,result);
+        return result;
     }
 
-    // ---------------- SUBTRACT ----------------
     @Override
-    public QuantityDTO subtract(QuantityDTO q1, QuantityDTO q2) {
-        try {
-            validateType(q1, q2);
-
-            Quantity<IMeasurable> quantity1 = DTOToQuantity(q1);
-            Quantity<IMeasurable> quantity2 = DTOToQuantity(q2);
-            
-            QuantityDTO result = toDTO(quantity1.subtract(quantity2),q1.getMeasurementType());
-
-            repository.save(new QuantityMeasurementEntity(
-                    "SUBTRACT", format(q1), format(q2), format(result)
-            ));
-
-            return result;
-
-        } catch (Exception e) {
-            repository.save(new QuantityMeasurementEntity("SUBTRACT", e.getMessage()));
-            throw new QuantityMeasurementException("Subtraction failed", e);
-        }
+    public double divide(Quantity<?> q1, Quantity<?> q2) throws Exception {
+        double result = q1.divide(q2);
+        save(q1);
+        save(q2);
+        saveHistory("DIVIDE",q1,q2,result);
+        return result;
     }
 
-    // ---------------- COMPARE ----------------
     @Override
-    public boolean compare(QuantityDTO q1, QuantityDTO q2) {
-        try {
-            validateType(q1, q2);
-
-            Quantity<IMeasurable> quantity1 = DTOToQuantity(q1);
-            Quantity<IMeasurable> quantity2 = DTOToQuantity(q2);
-            
-            boolean result = quantity1.equals(quantity2);
-
-            return result;
-
-        } catch (Exception e) {
-        	throw new QuantityMeasurementException(e.getMessage());
-        }
+    public boolean checkEquality(Quantity<?> q1, Quantity<?> q2) throws Exception {
+        boolean result = q1.equals(q2);
+        save(q1);
+        save(q2);
+        saveHistory("COMPARE", q1, q2, result);
+        return q1.equals(q2);
     }
 
-
-	// ---------------- DIVIDE ----------------
     @Override
-    public double divide(QuantityDTO q1, QuantityDTO q2) {
-        try {
-
-        	Quantity<IMeasurable> quantity1 = DTOToQuantity(q1);
-            Quantity<IMeasurable> quantity2 = DTOToQuantity(q2);
-            
-            double result = quantity1.divide(quantity2);
-
-            return result;
-
-        } catch (Exception e) {
-            repository.save(new QuantityMeasurementEntity("DIVIDE", e.getMessage()));
-            throw new QuantityMeasurementException("Division failed", e);
-        }
+    public Quantity<?> convert(Quantity<?> quantity, IMeasurable targetUnit) {
+        Quantity<?> result = quantity.convertTo(targetUnit);
+        save(quantity);
+        saveHistory("CONVERT",quantity,null,result);
+        return result;
     }
+
 }

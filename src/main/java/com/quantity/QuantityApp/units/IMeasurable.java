@@ -1,39 +1,22 @@
 package com.quantity.QuantityApp.units;
 
+import com.quantity.QuantityApp.exception.UnsupportedOperationsException;
+import com.quantity.QuantityApp.utill.SupportsArithmetic;
+
 public interface IMeasurable {
-	double getConversionFactor(); 
-	double convertToBaseUnit(double value);
-	double convertFromBaseUnit(double baseValue);
-	String getUnitName();
-	
-	// UC14 ---
-	// by default all units support arithmetic
-    default boolean supportsArithmetic() {
-        return true;
+    SupportsArithmetic supportsArithmetic = () -> true;
+
+    public String getUnitName();
+
+    public double getConversionFactor();
+
+    public double convertToBaseUnit(double value);
+
+    public double convertFromBaseUnit(double baseValue);
+
+    default boolean supportsArithmetic(){
+        return supportsArithmetic.isSupported();
     }
 
-    // validation hook
-    default void validateOperationSupport(String operation) {
-        if (!supportsArithmetic()) {
-            throw new UnsupportedOperationException(
-                getUnitName() + " does not support " + operation
-            );
-        }
-    }
-    
-	// UC15 as helper method
-	default String getMeasurementType() {
-		return this.getClass().getSimpleName();
-	}
-
-	static IMeasurable getUnitFromName(String name, Class<? extends Enum<?>> enumClass) {
-		for (Object constant : enumClass.getEnumConstants()) {
-			IMeasurable unit = (IMeasurable) constant;
-			if (unit.getUnitName().equalsIgnoreCase(name)) {
-				return unit;
-			}
-		}
-		throw new IllegalArgumentException("Invalid unit: " + name);
-	}
-	
+    default void validateOperationSupport(String operation) throws UnsupportedOperationsException {}
 }

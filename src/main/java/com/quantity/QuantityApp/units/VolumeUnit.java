@@ -1,40 +1,34 @@
 package com.quantity.QuantityApp.units;
 
-//UC11 --- Volume measurement units
-//base unit is LITRE
-public enum VolumeUnit implements IMeasurable {
-	LITRE(1.0), // Base unit
-	MILLILITRE(0.001), // 1 mL = 0.001 L
-	GALLON(3.78541); // 1 US gallon ≈ 3.78541 L
+public enum VolumeUnit implements IMeasurable{
+    LITRE(1.0),
+    MILLILITRE(0.001),
+    GALLON(3.78541);
 
-	private final double conversionFactorToLitre;
-	VolumeUnit(double conversionFactorToLitre) {
-		this.conversionFactorToLitre = conversionFactorToLitre;
-	}
+    private final double conversionFactor;
 
-	@Override
-	public double getConversionFactor() {
-		return conversionFactorToLitre;
-	}
+    private VolumeUnit(double conversionFactor) {
+        this.conversionFactor = conversionFactor;
+    }
 
-	@Override
-	public double convertToBaseUnit(double value) {
-		if (!Double.isFinite(value)) {
-			throw new IllegalArgumentException("Value must be finite");
-		}
-		return value * conversionFactorToLitre;
-	}
+    @Override
+    public String getUnitName(){
+        return this.name();
+    }
 
-	@Override
-	public double convertFromBaseUnit(double baseValue) {
-		if (!Double.isFinite(baseValue)) {
-			throw new IllegalArgumentException("Base value must be finite");
-		}
-		return baseValue / conversionFactorToLitre;
-	}
+    @Override
+    public double getConversionFactor() {
+        return conversionFactor;
+    }
 
-	@Override
-	public String getUnitName() {
-		return this.name();
-	}
+    @Override
+    public double convertToBaseUnit(double value){
+        return value * conversionFactor;
+    }
+
+    @Override
+    public double convertFromBaseUnit(double value){
+        return value / conversionFactor;
+    }
+
 }
