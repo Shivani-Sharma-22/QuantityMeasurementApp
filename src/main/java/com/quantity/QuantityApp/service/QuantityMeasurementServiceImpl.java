@@ -1,13 +1,12 @@
 package com.quantity.QuantityApp.service;
 
-import com.quantity.QuantityApp.Core.Quantity;
+import com.quantity.QuantityApp.core.Quantity;
 import com.quantity.QuantityApp.entity.OperationHistoryEntity;
 import com.quantity.QuantityApp.entity.QuantityMeasurementEntity;
 import com.quantity.QuantityApp.repository.OperationHistoryRepository;
 import com.quantity.QuantityApp.repository.QuantityMeasurementRepository;
 import com.quantity.QuantityApp.units.IMeasurable;
 import org.springframework.stereotype.Service;
-
 
 @Service
 public class QuantityMeasurementServiceImpl implements QuantityService{

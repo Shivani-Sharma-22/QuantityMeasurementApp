@@ -1,4 +1,4 @@
-package com.quantity.QuantityApp.Core;
+package com.quantity.QuantityApp.core;
 
 import com.quantity.QuantityApp.exception.UnsupportedOperationsException;
 import com.quantity.QuantityApp.units.IMeasurable;
@@ -18,6 +18,7 @@ public class Quantity<U extends IMeasurable>{
         this.unit = unit;
     }
 
+
     public double getValue() {
         return value;
     }
@@ -25,6 +26,7 @@ public class Quantity<U extends IMeasurable>{
     public U getUnit() {
         return unit;
     }
+
 
     protected enum ArithmeticOperation{
         ADD{
@@ -151,9 +153,11 @@ public class Quantity<U extends IMeasurable>{
         return baseValue;
     }
 
+
     private <V extends IMeasurable> double computeInBaseUnit(Quantity<?> other, V targetUnit, ArithmeticOperation operation){
         double baseValue = computeInBaseUnit(other, operation);
         return targetUnit.convertFromBaseUnit(baseValue);
     }
+
 
 }

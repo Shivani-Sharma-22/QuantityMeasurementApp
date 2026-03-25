@@ -2,11 +2,9 @@ package com.quantity.QuantityApp.controller;
 
 import com.quantity.QuantityApp.DTO.QuantityRequestDTO;
 import com.quantity.QuantityApp.DTO.TwoQuantityRequestDTO;
+import com.quantity.QuantityApp.core.Quantity;
 import com.quantity.QuantityApp.service.QuantityMeasurementServiceImpl;
 import com.quantity.QuantityApp.units.*;
-import com.quantity.QuantityApp.units.IMeasurable;
-import com.quantity.QuantityApp.Core.Quantity;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,13 +18,13 @@ public class QuantityMeasurementController {
 		this.service = service;
 	}
 
-	// 🔹 Convert DTO → Domain
+	// Convert DTO → Domain
 	private Quantity<?> toDomain(QuantityRequestDTO dto) {
 		IMeasurable unit = getUnit(dto.getMeasurementType(), dto.getUnit());
 		return new Quantity<>(dto.getValue(), unit);
 	}
 
-	// 🔹 SIMPLE unit logic (no Map)
+	// SIMPLE unit logic
 	private IMeasurable getUnit(String type, String unit) {
 		if (unit == null) {
 			throw new IllegalArgumentException("Unit cannot be null");
