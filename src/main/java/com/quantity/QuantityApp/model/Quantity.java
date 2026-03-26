@@ -1,4 +1,5 @@
-package com.quantity.QuantityApp.core;
+package com.quantity.QuantityApp.model;
+
 
 import com.quantity.QuantityApp.exception.UnsupportedOperationsException;
 import com.quantity.QuantityApp.units.IMeasurable;

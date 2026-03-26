@@ -1,6 +1,6 @@
 package com.quantity.QuantityApp.service;
 
-import com.quantity.QuantityApp.core.Quantity;
+import com.quantity.QuantityApp.model.Quantity;
 import com.quantity.QuantityApp.units.IMeasurable;
 import org.springframework.stereotype.Service;
 

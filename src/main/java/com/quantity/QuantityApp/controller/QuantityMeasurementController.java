@@ -2,7 +2,7 @@ package com.quantity.QuantityApp.controller;
 
 import com.quantity.QuantityApp.DTO.QuantityRequestDTO;
 import com.quantity.QuantityApp.DTO.TwoQuantityRequestDTO;
-import com.quantity.QuantityApp.core.Quantity;
+import com.quantity.QuantityApp.model.Quantity;
 import com.quantity.QuantityApp.service.QuantityMeasurementServiceImpl;
 import com.quantity.QuantityApp.units.*;
 import org.springframework.http.ResponseEntity;
