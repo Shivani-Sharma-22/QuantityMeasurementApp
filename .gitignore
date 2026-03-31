@@ -4,8 +4,10 @@ target/
 .vscode/
 .settings/
 .project/
-.HELP.md
-.maven
+.HELP.md/
+.maven/
+.DS_Store/
+.gitAtributes/
 .mvnw.cmd/
 *.class
 .mvn/wrapper/maven-wrapper.jar
