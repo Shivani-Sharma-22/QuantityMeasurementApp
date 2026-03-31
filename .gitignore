@@ -3,6 +3,10 @@ HELP.md
 target/
 .vscode/
 .settings/
+.project/
+.HELP.md
+.maven
+.mvnw.cmd/
 *.class
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
