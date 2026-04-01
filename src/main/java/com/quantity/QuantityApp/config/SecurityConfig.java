@@ -40,9 +40,11 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/v1/users/**",   // login/register
                                 "/oauth2/**",         // IMPORTANT
-                                "/login/**"           // IMPORTANT
+                                "/login/*","/h2-console/*"          // IMPORTANT
                         ).permitAll()
                         .anyRequest().authenticated()
+                ).headers(headers -> headers
+                        .frameOptions(frame -> frame.disable())
                 )
                 .oauth2Login(oauth -> oauth
                         .successHandler(oAuth2SuccessHandler)
@@ -50,5 +52,7 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    
+
     }
 }
