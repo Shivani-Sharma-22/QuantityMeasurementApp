@@ -3,6 +3,7 @@ package com.quantity.QuantityApp.security;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +16,10 @@ public class JwtUtil
     @Value("${jwt.secret}")
     private String SECRET; // 32+ chars
 
+    @PostConstruct
+    public void init() {
+        System.out.println("JWT SECRET: " + SECRET);
+    }
     private Key getKey() {
         return Keys.hmacShaKeyFor(SECRET.getBytes());
     }

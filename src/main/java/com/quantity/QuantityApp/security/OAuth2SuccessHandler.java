@@ -48,10 +48,10 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             repo.save(user);
         }
 
-        // Generate JWT
         String token = jwtUtil.generateToken(email);
 
-        // Send token in response
-        response.getWriter().write("JWT Token: " + token);
+        // Redirect back to Angular with the token as a query parameter
+        String redirectUrl = "http://localhost:4200/auth/login?token=" + token;
+        response.sendRedirect(redirectUrl);
     }
 }
